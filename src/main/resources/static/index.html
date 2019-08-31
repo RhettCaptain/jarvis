@@ -1,50 +1,64 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-	<title>Jarvis</title>
-	<script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
-	<script src="https://cdn.bootcss.com/hideseek/0.8.0/jquery.hideseek.js
+    <meta charset="UTF-8">
+    <title>Jarvis</title>
+    <script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/hideseek/0.8.0/jquery.hideseek.js
 "></script>
-	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 
 <body>
 <div>
-	<input id="bookmark-input" placeholder="search bookmark" data-list="#bookmark-container">
-	<div id="bookmark-container">
-		<div v-for = "bookmark in bookmarks">
-			<p><a href = "bookmark.href">{{bookmark.title}}</a></p>
-			<span v-for = "tag in bookmark.tags">{{tag}}</span>
-		</div>
-	</div>
+    <input id="bookmark-input" placeholder="search bookmark" data-list="#bookmark-container">
+    <div id="bookmark-container">
+        <div v-for="bookmark in bookmarks">
+            <p><a href="bookmark.href">{{bookmark.title}}</a></p>
+            <span v-for="tag in bookmark.tags">{{tag}}</span>
+        </div>
+    </div>
 </div>
-
 
 </body>
 <script>
   $("#bookmark-input").hideseek();
 
-  
   var vueInit = new Vue({
-	  el: '#bookmark-container',
-	  data: {
-		  bookmarks: []
-	  },
-	  method: function(){
-		  alert('hh');
-		  axios.post('/bookmark/getallbookmark', {
-		  })
-		  .then(function (response) {
-			  this.bookmarks = response.data;
-			  alert(this.bookmarks);
-		  })
-		  .catch(function (error) {
-		    console.log(error);
-		  });
-	  }
-  });
-  
+    el: '#bookmark-container',
+    data() {
+      return {
+        bookmarks: []
+      }
+    },
+    created() {
+      this.getAllBookmarks();
+    },
+    methods: {
+      // getAllBookmarks: function () {
+      //   var _this =this;
+      //   axios.post('/bookmark/getallbookmark', {})
+      //     .then(function (response) {
+      //       _this.bookmarks = response.data;
+      //       console.log(_this.bookmarks);
+      //     })
+      //     .catch(function (error) {
+      //       console.log(error);
+      //     });
+      // },
+      getAllBookmarks: function () {
+        axios.post('/bookmark/getallbookmark', {})
+          .then(response => {
+            this.bookmarks = response.data;
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      },
+    }
+  })
+
 </script>
 </html>
