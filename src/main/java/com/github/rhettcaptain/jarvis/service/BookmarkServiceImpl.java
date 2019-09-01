@@ -24,7 +24,7 @@ public class BookmarkServiceImpl implements BookmarkService {
     }
 
     public List<BookmarkVo> getBookmarkWithKeywords(String keywords) {
-        final List<String> keywordsList = Arrays.asList(keywords.split(" *")).stream()
+        final List<String> keywordsList = Arrays.asList(keywords.split(" +")).stream()
                 .filter(str -> !StringUtils.isEmpty(str)).collect(
                         Collectors.toList());
         List<BookmarkVo> matchedBookmarks = getAllBookmark().stream()
