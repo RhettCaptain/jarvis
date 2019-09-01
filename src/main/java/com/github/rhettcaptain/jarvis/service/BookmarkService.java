@@ -6,4 +6,5 @@ import com.github.rhettcaptain.jarvis.vo.BookmarkVo;
 
 public interface BookmarkService {
 	public List<BookmarkVo> getAllBookmark();
+	public List<BookmarkVo> getBookmarkWithKeywords(String keywords);
 }
