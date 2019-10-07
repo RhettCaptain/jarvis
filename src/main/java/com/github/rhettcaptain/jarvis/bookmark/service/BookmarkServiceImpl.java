@@ -77,13 +77,14 @@ public class BookmarkServiceImpl implements BookmarkService {
 	private boolean isKeywordsMatched(final BookmarkVo mark, List<String> keywordsList) {
 		boolean allMatched = true;
 		for (String keywords : keywordsList) {
+		    keywords = keywords.toLowerCase();
 			boolean oneMatched = false;
-			if (mark.getTitle().contains(keywords)) {
+			if (mark.getTitle().toLowerCase().contains(keywords)) {
 				oneMatched = true;
 				continue;
 			}
 			for (String tag : convertTagsToTagList(mark.getTags())) {
-				if (tag.contains(keywords)) {
+				if (tag.toLowerCase().contains(keywords)) {
 					oneMatched = true;
 					break;
 				}
@@ -114,14 +115,9 @@ public class BookmarkServiceImpl implements BookmarkService {
 	}
 
 	private String addProxyForHref(String href) {
-		if (!StringUtils.isEmpty(href)) {
-			if (href.startsWith("www")) {
-				log.warn("No proxy for {}, add http:// ahead", href);
-				return ("http://" + href);
-			} else {
-				log.warn("No proxy for {}, add file:// ahead", href);
-				return ("file://" + href);
-			}
+		if (!StringUtils.isEmpty(href) && !href.contains("://")) {
+            log.warn("No proxy for {}, add http:// ahead", href);
+            return ("http://" + href);
 		}
 		return href;
 	}
