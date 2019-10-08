@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Jarvis</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/lodash@4.13.1/lodash.min.js"></script>
+</head>
+
+<body>
+<div id="todo-container">
+    <h2 style="text-align: center">Jarvis TODO</h2>
+    <div id="left-div" class="col-xs-9">
+        <div class="panel panel-primary" id="doing-panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">Doing Items</h3>
+            </div>
+            <div class="panel-body">
+                这是一个基本的面板
+            </div>
+        </div>
+        <div class="panel panel-success" id="pending-panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">Pending Items</h3>
+            </div>
+            <div class="panel-body">
+                这是一个基本的面板
+            </div>
+        </div>
+        <div class="panel panel-danger " id="todo-panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">Todo items</h3>
+            </div>
+            <div class="panel-body">
+                这是一个基本的面板
+            </div>
+        </div>
+        <div class="panel panel-info" id="done-panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">Done Items</h3>
+            </div>
+            <div class="panel-body">
+                这是一个基本的面板
+            </div>
+        </div>
+    </div>
+
+    <div id="right-div" class="col-xs-3">
+        <div class="panel panel-default" id="template-panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">Template Items</h3>
+            </div>
+            <div class="panel-body">
+                <div draggable="true" ondragstart="drag(event)">这是一个可拖拽的面板</div>
+            </div>
+        </div>
+        <div class="panel panel-warning" id="future-panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">Future Items</h3>
+            </div>
+            <div class="panel-body" ondrop="drop(event)" ondragover="allowDrop(event)">
+                dropped mianban的
+            </div>
+        </div>
+    </div>
+
+<script>
+    function allowDrop(ev)
+    {
+        ev.preventDefault();
+    }
+
+    function drag(ev)
+    {
+        ev.dataTransfer.setData("Text",11);
+    }
+
+    function drop(ev)
+    {
+        ev.preventDefault();
+        var data=ev.dataTransfer.getData("Text");
+        alert(data);
+    }
+</script>
+</html>
