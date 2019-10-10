@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Financial Comparator</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div>
+    <h3>Financial Comparator</h3>
+</div>
+<div class="panel panel-default calculator col-xs-6">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            Financial Calculator
+        </h3>
+    </div>
+    <div class="panel-body">
+        <div class="input-group">
+            <input type="number" class="form-control principal" placeholder="本金">
+            <span class="input-group-addon">元</span>
+        </div>
+        <div class="input-group">
+            <input type="number" class="form-control rate" placeholder="年化利率">
+            <span class="input-group-addon">%</span>
+        </div>
+        <div class="input-group">
+            <input type="number" class="form-control period " placeholder="天数">
+            <span class="input-group-addon">天</span>
+        </div>
+        <div class="input-group">
+            <input type="number" class="form-control interest" disabled="true" placeholder="到期利息">
+            <span class="input-group-addon">元</span>
+        </div>
+    </div>
+</div>
+<div class="panel panel-default calculator col-xs-6">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            Financial Calculator
+        </h3>
+    </div>
+    <div class="panel-body">
+        <div class="input-group">
+            <input type="number" class="form-control principal" placeholder="本金">
+            <span class="input-group-addon">元</span>
+        </div>
+        <div class="input-group">
+            <input type="number" class="form-control rate" placeholder="年化利率">
+            <span class="input-group-addon">%</span>
+        </div>
+        <div class="input-group">
+            <input type="number" class="form-control period " placeholder="天数">
+            <span class="input-group-addon">天</span>
+        </div>
+        <div class="input-group">
+            <input type="number" class="form-control interest" disabled="true" placeholder="到期利息">
+            <span class="input-group-addon">元</span>
+        </div>
+    </div>
+</div>
+<div>
+    <span class="label label-success">2年</span>
+    <label>730</label>
+    <span class="label label-success">3年</span>
+    <label>1095</label>
+    <span class="label label-success">5年</span>
+    <label>1825</label>
+
+    <span class="label label-info">千</span>
+    <label>000</label>
+    <span class="label label-info">万</span>
+    <label>0000</label>
+    <span class="label label-info">十万</span>
+    <label>00000</label>
+    <span class="label label-info">百万</span>
+    <label>000000</label>
+</div>
+<script>
+  $(document).ready(function(){
+    $("input").blur(function(){
+      var calculator = $(this).parent().parent();
+      var principal = calculator.find(".principal").val();
+      var rate = calculator.find(".rate").val();
+      var period = calculator.find(".period").val();
+      var interest = principal * period * rate / 100 / 365;
+      calculator.find(".interest").val(interest.toFixed(2));
+    });
+  });
+</script>
+</body>
+</html>
