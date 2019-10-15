@@ -20,16 +20,20 @@
             <div class="panel-heading">
                 <h3 class="panel-title">Doing Items</h3>
             </div>
-            <div class="panel-body">
-                这是一个基本的面板
+            <div  ondrop="vueDoingPanel.drop(event)" ondragover="allowDrop(event)" class="panel-body">
+                <ul v-for = "book of books">
+                    <li draggable="true" ondragstart="vueDoingPanel.drag(event,'dd')">{{book}}</li>
+                </ul>
             </div>
         </div>
         <div class="panel panel-success" id="pending-panel">
             <div class="panel-heading">
                 <h3 class="panel-title">Pending Items</h3>
             </div>
-            <div class="panel-body">
-                这是一个基本的面板
+            <div  ondrop="vueDoingPanel.drop(event)" class="panel-body">
+                <ul v-for = "book in books">
+                    <li draggable="true" ondragstart="vuePendingPanel.drag(event, 'hh')" >{{book}}</li>
+                </ul>
             </div>
         </div>
         <div class="panel panel-danger " id="todo-panel">
@@ -72,6 +76,42 @@
 </body>
 
 <script>
+    var vueDoingPanel = new Vue({
+      el: "#doing-panel",
+      data: {
+        books: ["book1", "book2"]
+      },
+      methods: {
+        drag: function(ev, book){
+          var data = book;
+          ev.dataTransfer.setData("Text",data);
+        },
+        drop: function(ev){
+          ev.preventDefault();
+          var data=ev.dataTransfer.getData("Text");
+          alert(data);
+        }
+      }
+    });
+
+    var vuePendingPanel = new Vue({
+      el: "#pending-panel",
+      data: {
+        books: ["book3", "book4"]
+      },
+      methods: {
+        drag: function(ev, book){
+          var data = book;
+          ev.dataTransfer.setData("Text",data);
+        },
+        drop: function(ev){
+          var data=ev.dataTransfer.getData("Text");
+          alert(data);
+
+          ev.preventDefault();
+        }
+      }
+    });
     function allowDrop(ev)
     {
         ev.preventDefault();
@@ -88,5 +128,7 @@
         var data=ev.dataTransfer.getData("Text");
         alert(data);
     }
+
+
 </script>
 </html>
