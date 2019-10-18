@@ -20,9 +20,9 @@
             <div class="panel-heading">
                 <h3 class="panel-title">Doing Items</h3>
             </div>
-            <div  ondrop="vueDoingPanel.drop(event)" ondragover="allowDrop(event)" class="panel-body">
-                <ul v-for = "book of books">
-                    <li draggable="true" ondragstart="vueDoingPanel.drag(event,'dd')">{{book}}</li>
+            <div ondrop="vueDoingPanel.drop(event)" ondragover="allowDrop(event)" class="panel-body">
+                <ul v-for="item of items">
+                    <li draggable="true" v-on:dragstart="drag($event,item)">{{item}}</li>
                 </ul>
             </div>
         </div>
@@ -30,9 +30,9 @@
             <div class="panel-heading">
                 <h3 class="panel-title">Pending Items</h3>
             </div>
-            <div  ondrop="vueDoingPanel.drop(event)" class="panel-body">
-                <ul v-for = "book in books">
-                    <li draggable="true" ondragstart="vuePendingPanel.drag(event, 'hh')" >{{book}}</li>
+            <div ondrop="vueDoingPanel.drop(event)" ondragover="allowDrop(event)" class="panel-body">
+                <ul v-for="item of items">
+                    <li draggable="true" v-on:dragstart="drag($event, item)">{{item}}</li>
                 </ul>
             </div>
         </div>
@@ -76,58 +76,77 @@
 </body>
 
 <script>
-    var vueDoingPanel = new Vue({
-      el: "#doing-panel",
-      data: {
-        books: ["book1", "book2"]
-      },
-      methods: {
-        drag: function(ev, book){
-          var data = book;
-          ev.dataTransfer.setData("Text",data);
-        },
-        drop: function(ev){
-          ev.preventDefault();
-          var data=ev.dataTransfer.getData("Text");
-          alert(data);
-        }
-      }
+
+  function allowDrop(ev) {
+    ev.preventDefault();
+  }
+
+  function drag(ev) {
+    ev.dataTransfer.setData("Text", 11);
+  }
+
+  function drop(ev) {
+    ev.preventDefault();
+    var data = ev.dataTransfer.getData("Text");
+    alert(data);
+  }
+
+  function getItemsByType(type, vue) {
+    // var searchkey = this.searchkey;
+    axios.post('/todo/getitembytype', {type:type})
+      .then(response => {
+      vue.items = response.data;
+    }).catch(function (error) {
+      console.log(error);
     });
+  }
 
-    var vuePendingPanel = new Vue({
-      el: "#pending-panel",
-      data: {
-        books: ["book3", "book4"]
+
+  var vueDoingPanel = new Vue({
+    el: "#doing-panel",
+    data: {
+      items: []
+    },
+    created() {
+      this.getItems();
+    },
+    methods: {
+      getItems: function () {
+        getItemsByType('doing', this);
       },
-      methods: {
-        drag: function(ev, book){
-          var data = book;
-          ev.dataTransfer.setData("Text",data);
-        },
-        drop: function(ev){
-          var data=ev.dataTransfer.getData("Text");
-          alert(data);
-
-          ev.preventDefault();
-        }
-      }
-    });
-    function allowDrop(ev)
-    {
-        ev.preventDefault();
-    }
-
-    function drag(ev)
-    {
-        ev.dataTransfer.setData("Text",11);
-    }
-
-    function drop(ev)
-    {
-        ev.preventDefault();
-        var data=ev.dataTransfer.getData("Text");
+      drag: function (ev, item) {
+        var data = item;
+        ev.dataTransfer.setData("Text", item);
+      },
+      drop: function (ev) {
+        var data = ev.dataTransfer.getData("Text");
         alert(data);
+      }
     }
+  });
+
+  var vuePendingPanel = new Vue({
+    el: "#pending-panel",
+    data: {
+      items: []
+    },
+    created() {
+      this.getItems();
+    },
+    methods: {
+      getItems: function () {
+        getItemsByType('pending', this);
+      },
+      drag: function (ev, item) {
+        var data = item;
+        ev.dataTransfer.setData("Text", data);
+      },
+      drop: function (ev) {
+        var data = ev.dataTransfer.getData("Text");
+        alert(data);
+      }
+    }
+  });
 
 
 </script>

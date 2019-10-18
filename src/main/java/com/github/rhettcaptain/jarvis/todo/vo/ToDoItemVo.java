@@ -1,19 +1,19 @@
-package com.github.rhettcaptain.jarvis.todo.dto;
+package com.github.rhettcaptain.jarvis.todo.vo;
 
-import com.github.rhettcaptain.jarvis.bookmark.dto.ItemType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
+import java.io.Serializable;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ToDoItemDto {
-    private UUID uuid;
+public class ToDoItemVo implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private String uuid;
     private String title;
     private String detail;
     private long createdTime;
@@ -21,5 +21,4 @@ public class ToDoItemDto {
     private long finishedTime;
     private long costTime;
     private String type;
-
 }
