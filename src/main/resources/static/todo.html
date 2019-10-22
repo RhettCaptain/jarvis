@@ -15,7 +15,7 @@
 <body>
 <div id="todo-container">
     <h2 style="text-align: center">Jarvis TODO</h2>
-    <div id="left-div" class="col-xs-9">
+    <div id="left-div" class="col-xs-8">
         <div class="panel panel-primary" id="doing-panel">
             <div class="panel-heading">
                 <h3 class="panel-title">Doing Items</h3>
@@ -25,14 +25,22 @@
                     <div draggable="true" v-on:dragstart="drag(item)" class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" :href="'#'+item.uuid" aria-expanded="false" >
-                                {{item.title}}
+                                <a role="button" data-toggle="collapse" :href="'#'+item.uuid" aria-expanded="false">
+                                    <input class="col-xs-10" :value="item.title" disabled="disabled"/>
                                 </a>
+                                <div class="input-group">
+                                    <button v-on:click="onEdit(item)">Edit</button>
+                                    <button v-on:click="onDel(item)">Del</button>
+                                </div>
                             </h4>
                         </div>
                         <div :id="item.uuid" class="panel-collapse collapse out" >
                             <div class="panel-body">
-                                {{item.uuid}}
+                                <div class="col-xs-6">
+                                    <label>Due Time:</label>
+                                    <input :value="item.">
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -74,15 +82,32 @@
         </div>
     </div>
 
-    <div id="right-div" class="col-xs-3">
+    <div id="right-div" class="col-xs-4">
         <div class="panel panel-default" id="template-panel">
             <div class="panel-heading">
                 <h3 class="panel-title">Template Items</h3>
             </div>
             <div v-on:drop="drop()" ondragover="allowDrop(event)" class="panel-body">
-                <ul v-for="item of items">
-                    <li draggable="true" v-on:dragstart="drag(item)">{{item}}</li>
-                </ul>
+                <div v-for="item of items">
+                    <div draggable="true" v-on:dragstart="drag(item)" class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a role="button" data-toggle="collapse" :href="'#'+item.uuid" aria-expanded="false">
+                                    <input class="col-xs-9" :value="item.title" disabled="true"/>
+                                </a>
+                                <div class="input-group">
+                                    <button>Edit</button>
+                                    <button>Del</button>
+                                </div>
+                            </h4>
+                        </div>
+                        <div :id="item.uuid" class="panel-collapse collapse out" >
+                            <div class="panel-body">
+                                {{item.uuid}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="panel panel-warning" id="future-panel">
@@ -102,6 +127,20 @@
 <script>
   function deepCopy(obj) {
     return JSON.parse(JSON.stringify(obj));
+  }
+
+  function toggleEdit(item, element) {
+    var queryDom = $(element);
+    var topItemDiv = queryDom.parent().parent().parent().parent();
+    var itemInput = topItemDiv.find("input");
+    alert(itemInput.val());
+    if(queryDom.text() == 'Edit'){
+      queryDom.text('Save');
+      itemInput.attr('disabled', false);
+    }else if(queryDom.text() == 'Save'){
+      queryDom.text('Edit');
+      itemInput.attr('disabled', true);
+    }
   }
 
   function recordDragInfo(item, vue) {
@@ -191,6 +230,15 @@
 
         // start timer
         this.timer[dragItem.uuid] = new Date().getTime();
+      },
+      onEdit: function (item) {
+        toggleEdit(item, event.currentTarget);
+      },
+      onDel: function (item) {
+        dragItem = item;
+        dragVue = this;
+        dragType = this.type;
+        removeDraggedItem();
       }
     }
   });
