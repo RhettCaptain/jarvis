@@ -15,27 +15,75 @@
 <body>
 <div style="text-align: center">
     <h3>Stephenie Office -- SUM</h3>
+    <label>Rhett Loves Stephenie Forever</label>
 </div>
 <hr>
 <div class="col-xs-8 col-xs-offset-2 input-group">
     <span class="input-group-addon">标识列(剩余列求和)</span>
-    <input type="text"  class="form-control" placeholder="1,2"/>
+    <input type="text" id="id-col" class="form-control" placeholder="1,2"/>
     <span class="input-group-btn">
         <button class="btn btn-default" type="button" onclick="sum()">求和</button>
     </span>
 </div>
 <br/>
 <div class="col-xs-6">
-    <textarea id="input-text" class="col-xs-12"></textarea>
+    <textarea id="input-text" class="col-xs-12" rows="20"></textarea>
 </div>
 <div class="col-xs-6">
-    <textarea id="output-text" class="col-xs-12"></textarea>
+    <textarea id="output-text" class="col-xs-12" rows="20"></textarea>
 </div>
 </body>
 
 <script>
     function sum(){
-
+        var inputText = $('#input-text').val();
+        console.log($('#id-col').val());
+        var idCols = $('#id-col').val().split(',');
+        var lines = inputText.split('\n');
+        var lineCount = lines.length;
+        var colCount = lines[0].split(',').length;
+        var tmpArr = [];
+        for(var lineIdx=0; lineIdx<lineCount; lineIdx++){
+            var thisLine = lines[lineIdx].split(',');
+            var isExist = false;
+            for(var tmpIdx=0; tmpIdx<tmpArr.length; tmpIdx++){
+                var tmpLine = tmpArr[tmpIdx];
+                var isSame = true;
+                for(var idIdxPlus of idCols){
+                    if(tmpLine[idIdxPlus-1] != thisLine[idIdxPlus-1]){
+                        isSame = false;
+                        break;
+                    }
+                }
+                if(isSame){
+                    for(var colIdx=0; colIdx<colCount; colIdx++){
+                        if(!idCols.includes(String(Number(colIdx)+1))){
+                            if(!isNaN(thisLine[colIdx])){
+                                tmpArr[tmpIdx][colIdx] = Number(tmpArr[tmpIdx][colIdx]) + Number(thisLine[colIdx]);
+                            }else{
+                                tmpArr[tmpIdx][colIdx] = tmpArr[tmpIdx][colIdx] + '#' + thisLine[colIdx];
+                            }
+                        }
+                    }
+                    isExist = true;
+                    break;
+                }
+            }
+            if(!isExist){
+                tmpArr.push(thisLine);
+            }
+        }
+        var outText = '';
+        for(var line of tmpArr){
+            var lineStr = '';
+            for(var colIdx=0; colIdx<line.length-1; colIdx++){
+                lineStr = lineStr + line[colIdx] + ',';
+            }
+            lineStr = lineStr + line[line.length-1] + '\n';
+            outText += lineStr;
+        }
+        outText = outText.substring(0, outText.length-1);
+        $('#output-text').val(outText);
     }
 </script>
 </html>
