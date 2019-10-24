@@ -1,4 +1,4 @@
-package com.github.rhettcaptain.jarvis.bookmark.dto;
+package com.github.rhettcaptain.jarvis.todo.consts;
 
 public enum ItemType{
     TODO,

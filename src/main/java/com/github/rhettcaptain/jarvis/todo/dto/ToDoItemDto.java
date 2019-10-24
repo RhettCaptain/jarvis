@@ -1,6 +1,5 @@
 package com.github.rhettcaptain.jarvis.todo.dto;
 
-import com.github.rhettcaptain.jarvis.bookmark.dto.ItemType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,6 +19,7 @@ public class ToDoItemDto {
     private long dueTime;
     private long finishedTime;
     private long costTime;
+    // use com.github.rhettcaptain.jarvis.todo.consts.ItemType value
     private String type;
 
 }
