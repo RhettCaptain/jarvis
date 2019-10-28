@@ -18,7 +18,12 @@
     <div id="left-div" class="col-xs-8">
         <div class="panel panel-primary" id="doing-panel">
             <div class="panel-heading">
-                <h3 class="panel-title">Doing Items</h3>
+                <div class="input-group">
+                    <h3 class="panel-title" style="padding-top: 3px">Doing Items</h3>
+                    <span class="input-group-btn">
+                        <button v-on:click="onCreate()" class="btn btn-default btn-xs" type="button">+</button>
+                    </span>
+                </div>
             </div>
             <div v-on:drop="drop()" ondragover="allowDrop(event)" class="panel-body">
                 <div v-for="item of items">
@@ -34,17 +39,30 @@
                                 </div>
                             </h4>
                         </div>
-                        <div :id="item.uuid" class="panel-collapse collapse out" >
+                        <div :id="item.uuid" class="panel-collapse collapse out">
                             <div class="panel-body">
                                 <div class="col-xs-6">
-                                    <label>Due Time:</label>
-                                    <input :value="item.dueTime">
+                                    <label style="width: 20%">Due Time:</label>
+                                    <input :value="item.dueTime" disabled="disabled" style="width: 75%">
                                 </div>
                                 <div class="col-xs-6">
-                                    <label>Cost Time:</label>
-                                    <span>{{item.costTime}}</span>
+                                    <label style="width: 20%">Cost Time:</label>
+                                    <input :value="item.costTime" disabled="disabled" style="width: 75%">
                                 </div>
 
+                                <div class="col-xs-12">
+                                    <label>Detail:</label>
+                                    <textarea rows="5" class="col-xs-12" disabled="disabled"
+                                              style="resize: none"></textarea>
+                                </div>
+                                <div class="col-xs-6">
+                                    <label>Created Time:</label>
+                                    <span>{{item.createdTime}}</span>
+                                </div>
+                                <div class="col-xs-6">
+                                    <label>Finished Time:</label>
+                                    <span>{{item.finishedTime}}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -105,7 +123,7 @@
                                 </div>
                             </h4>
                         </div>
-                        <div :id="item.uuid" class="panel-collapse collapse out" >
+                        <div :id="item.uuid" class="panel-collapse collapse out">
                             <div class="panel-body">
                                 {{item.uuid}}
                             </div>
@@ -129,258 +147,278 @@
 </body>
 
 <script>
-  function deepCopy(obj) {
-    return JSON.parse(JSON.stringify(obj));
-  }
-
-  function toggleEdit(item, element) {
-    var queryDom = $(element);
-    var topItemDiv = queryDom.parent().parent().parent().parent();
-    var itemInput = topItemDiv.find("input");
-    alert(itemInput.val());
-    if(queryDom.text() == 'Edit'){
-      queryDom.text('Save');
-      itemInput.attr('disabled', false);
-    }else if(queryDom.text() == 'Save'){
-      queryDom.text('Edit');
-      itemInput.attr('disabled', true);
-    }
-  }
-
-  function recordDragInfo(item, vue) {
-    dragItem = item;
-    dragType = vue.type;
-    dragVue = vue;
-  }
-
-  function allowDrop(ev) {
-    ev.preventDefault();
-  }
-
-  function getItemsByType(type, vue) {
-    axios.post('/todo/getitembytype', {type:type})
-      .then(response => {
-      vue.items = response.data;
-      }).catch(function (error) {
-      console.log(error);
-    });
-  }
-
-  function removeDraggedItem() {
-    var item = deepCopy(dragItem);
-    // remove in front-end
-    for(var idx in dragVue.items){
-      if(dragVue.items[idx].uuid == item.uuid){
-        dragVue.items.splice(idx,1);
-        break;
-      }
-    }
-    // remove in back-end
-    console.info(item.type);
-    axios.post('/todo/deleteitem', item)
-      .catch(function (error) {
-      console.log(error);
-    });
-  }
-  
-  function addDroppedItem(vue) {
-    var item = deepCopy(dragItem);
-    // calculate time cost
-    if(dragType == 'doing'){
-      var timeCost = new Date().getTime() - (dragVue.timer[item.uuid] == null ? dragVue.timer['created'] : dragVue.timer[item.uuid]);
-      item.costTime += timeCost;
+    function deepCopy(obj) {
+        return JSON.parse(JSON.stringify(obj));
     }
 
-    // add in front-end
-    item.type = vue.type;
-    vue.items.push(item);
-    // add in back-end
-    axios.post('/todo/additem', item)
-      .catch(function (error) {
-        console.log(error);
-      });
-  }
+    function toggleEdit(item, element) {
+        var queryDom = $(element);
+        var topItemDiv = queryDom.parent().parent().parent().parent();
+        var itemInput = topItemDiv.find("input");
+        var itemText = topItemDiv.find("textarea");
+        alert(itemInput.val());
+        if (queryDom.text() == 'Edit') {
+            queryDom.text('Save');
+            itemInput.attr('disabled', false);
+            itemText.attr('disabled', false);
+        } else if (queryDom.text() == 'Save') {
+            queryDom.text('Edit');
+            itemInput.attr('disabled', true);
+            itemText.attr('disabled', true);
+        }
+    }
 
-  var dragItem;
-  var dragType;
-  var dragVue;
-
-  var vueDoingPanel = new Vue({
-    el: "#doing-panel",
-    data: {
-      type: 'doing',
-      items: [{'uuid':'001','title':'t1'},{'uuid':'002','title':'t2'}],
-      timer: {}
-    },
-    created() {
-      this.getItems();
-      var now = new Date();
-      this.timer["created"] = now.getTime();
-      this.items.forEach( function(item){this.timer[item.uuid] = now.getTime();});
-    },
-    methods: {
-      getItems: function () {
-        getItemsByType(this.type, this);
-      },
-      drag: function (item) {
-        recordDragInfo(item, this);
-      },
-      drop: function () {
-        // remove old item
-        removeDraggedItem();
-
-        // add new item
-        addDroppedItem(this);
-
-        // start timer
-        this.timer[dragItem.uuid] = new Date().getTime();
-      },
-      onEdit: function (item) {
-        toggleEdit(item, event.currentTarget);
-      },
-      onDel: function (item) {
+    function recordDragInfo(item, vue) {
         dragItem = item;
-        dragVue = this;
-        dragType = this.type;
-        removeDraggedItem();
-      }
+        dragType = vue.type;
+        dragVue = vue;
     }
-  });
 
-  var vuePendingPanel = new Vue({
-    el: "#pending-panel",
-    data: {
-      type: 'pending',
-      items: []
-    },
-    created() {
-      this.getItems();
-    },
-    methods: {
-      getItems: function () {
-        getItemsByType(this.type, this);
-      },
-      drag: function (item) {
-        recordDragInfo(item, this);
-      },
-      drop: function () {
-        // remove old item
-        removeDraggedItem();
-
-        // add new item
-        addDroppedItem(this);
-
-      }
+    function allowDrop(ev) {
+        ev.preventDefault();
     }
-  });
 
-  var vueTodoPanel = new Vue({
-    el: "#todo-panel",
-    data: {
-      type: 'todo',
-      items: []
-    },
-    created() {
-      this.getItems();
-    },
-    methods: {
-      getItems: function () {
-        getItemsByType(this.type, this);
-      },
-      drag: function (item) {
-        recordDragInfo(item, this);
-      },
-      drop: function () {
-        // remove old item
-        removeDraggedItem();
-
-        // add new item
-        addDroppedItem(this);
-
-      }
+    function getItemsByType(type, vue) {
+        axios.post('/todo/getitembytype', {type: type})
+            .then(response => {
+            vue.items = response.data;
+        }).
+        catch(function (error) {
+            console.log(error);
+        });
     }
-  });
 
-  var vueDonePanel = new Vue({
-    el: "#done-panel",
-    data: {
-      type: 'done',
-      items: []
-    },
-    created() {
-      this.getItems();
-    },
-    methods: {
-      getItems: function () {
-        getItemsByType(this.type, this);
-      },
-      drag: function (item) {
-        recordDragInfo(item, this);
-      },
-      drop: function () {
-        // remove old item
-        removeDraggedItem();
-
-        // add new item
-        addDroppedItem(this);
-
-      }
+    function removeDraggedItem() {
+        var item = deepCopy(dragItem);
+        // remove in front-end
+        for (var idx in dragVue.items) {
+            if (dragVue.items[idx].uuid == item.uuid) {
+                dragVue.items.splice(idx, 1);
+                break;
+            }
+        }
+        // remove in back-end
+        console.info(item.type);
+        axios.post('/todo/deleteitem', item)
+            .catch(function (error) {
+                console.log(error);
+            });
     }
-  });
 
-  var vueTemplatePanel = new Vue({
-    el: "#template-panel",
-    data: {
-      type: 'template',
-      items: []
-    },
-    created() {
-      this.getItems();
-    },
-    methods: {
-      getItems: function () {
-        getItemsByType(this.type, this);
-      },
-      drag: function (item) {
-        recordDragInfo(item, this);
-      },
-      drop: function () {
-        // remove old item
-        removeDraggedItem();
+    function addDroppedItem(vue) {
+        var item = deepCopy(dragItem);
+        // calculate time cost
+        if (dragType == 'doing') {
+            var timeCost = new Date().getTime() - (dragVue.timer[item.uuid] == null ? dragVue.timer['created'] : dragVue.timer[item.uuid]);
+            item.costTime += timeCost;
+        }
 
-        // add new item
-        addDroppedItem(this);
-
-      }
+        // add in front-end
+        item.type = vue.type;
+        vue.items.push(item);
+        // add in back-end
+        axios.post('/todo/additem', item)
+            .catch(function (error) {
+                console.log(error);
+            });
     }
-  });
 
-  var vueFuturePanel = new Vue({
-    el: "#future-panel",
-    data: {
-      type: 'future',
-      items: []
-    },
-    created() {
-      this.getItems();
-    },
-    methods: {
-      getItems: function () {
-        getItemsByType(this.type, this);
-      },
-      drag: function (item) {
-        recordDragInfo(item, this);
-      },
-      drop: function () {
-        // remove old item
-        removeDraggedItem();
-
-        // add new item
-        addDroppedItem(this);
-
-      }
+    function createNewItem(vue) {
+        axios.post('/todo/createnewitem', {type: vue.type})
+            .then(response => {
+                var newItem = response.data;
+                vue.items.push(newItem);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
     }
-  });
+
+    var dragItem;
+    var dragType;
+    var dragVue;
+
+    var vueDoingPanel = new Vue({
+        el: "#doing-panel",
+        data: {
+            type: 'doing',
+            items: [{'uuid': '001', 'title': 't1'}, {'uuid': '002', 'title': 't2'}],
+            timer: {}
+        },
+        created() {
+            this.getItems();
+            var now = new Date();
+            this.timer["created"] = now.getTime();
+            this.items.forEach(function (item) {
+                this.timer[item.uuid] = now.getTime();
+            });
+        },
+        methods: {
+            getItems: function () {
+                getItemsByType(this.type, this);
+            },
+            drag: function (item) {
+                recordDragInfo(item, this);
+            },
+            drop: function () {
+                // remove old item
+                removeDraggedItem();
+
+                // add new item
+                addDroppedItem(this);
+
+                // start timer
+                this.timer[dragItem.uuid] = new Date().getTime();
+            },
+            onCreate: function () {
+                createNewItem(this);
+            },
+            onEdit: function (item) {
+                toggleEdit(item, event.currentTarget);
+            },
+            onDel: function (item) {
+                dragItem = item;
+                dragVue = this;
+                dragType = this.type;
+                removeDraggedItem();
+            }
+        }
+    });
+
+    var vuePendingPanel = new Vue({
+        el: "#pending-panel",
+        data: {
+            type: 'pending',
+            items: []
+        },
+        created() {
+            this.getItems();
+        },
+        methods: {
+            getItems: function () {
+                getItemsByType(this.type, this);
+            },
+            drag: function (item) {
+                recordDragInfo(item, this);
+            },
+            drop: function () {
+                // remove old item
+                removeDraggedItem();
+
+                // add new item
+                addDroppedItem(this);
+
+            }
+        }
+    });
+
+    var vueTodoPanel = new Vue({
+        el: "#todo-panel",
+        data: {
+            type: 'todo',
+            items: []
+        },
+        created() {
+            this.getItems();
+        },
+        methods: {
+            getItems: function () {
+                getItemsByType(this.type, this);
+            },
+            drag: function (item) {
+                recordDragInfo(item, this);
+            },
+            drop: function () {
+                // remove old item
+                removeDraggedItem();
+
+                // add new item
+                addDroppedItem(this);
+
+            }
+        }
+    });
+
+    var vueDonePanel = new Vue({
+        el: "#done-panel",
+        data: {
+            type: 'done',
+            items: []
+        },
+        created() {
+            this.getItems();
+        },
+        methods: {
+            getItems: function () {
+                getItemsByType(this.type, this);
+            },
+            drag: function (item) {
+                recordDragInfo(item, this);
+            },
+            drop: function () {
+                // remove old item
+                removeDraggedItem();
+
+                // add new item
+                addDroppedItem(this);
+
+            }
+        }
+    });
+
+    var vueTemplatePanel = new Vue({
+        el: "#template-panel",
+        data: {
+            type: 'template',
+            items: []
+        },
+        created() {
+            this.getItems();
+        },
+        methods: {
+            getItems: function () {
+                getItemsByType(this.type, this);
+            },
+            drag: function (item) {
+                recordDragInfo(item, this);
+            },
+            drop: function () {
+                // remove old item
+                removeDraggedItem();
+
+                // add new item
+                addDroppedItem(this);
+
+            }
+        }
+    });
+
+    var vueFuturePanel = new Vue({
+        el: "#future-panel",
+        data: {
+            type: 'future',
+            items: []
+        },
+        created() {
+            this.getItems();
+        },
+        methods: {
+            getItems: function () {
+                getItemsByType(this.type, this);
+            },
+            drag: function (item) {
+                recordDragInfo(item, this);
+            },
+            drop: function () {
+                // remove old item
+                removeDraggedItem();
+
+                // add new item
+                addDroppedItem(this);
+
+            }
+        }
+    });
 
 
 </script>

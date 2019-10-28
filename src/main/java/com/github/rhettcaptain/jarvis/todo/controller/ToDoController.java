@@ -45,4 +45,14 @@ public class ToDoController {
     public void addItem(@RequestBody ToDoItemVo itemVo){
         System.out.println("add"+itemVo);
     }
+
+    /**
+     *
+     * @param ItemType  {TYPE_KEY: }
+     */
+    @RequestMapping(value = "createnewitem", method = RequestMethod.POST)
+    @ResponseBody
+    public ToDoItemVo createNewItem(@RequestBody Map<String,String> ItemType){
+        return ToDoItemVo.builder().uuid(UUID.randomUUID().toString()).type(ItemType.get(TYPE_KEY)).build();
+    }
 }
