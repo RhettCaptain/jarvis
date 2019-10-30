@@ -16,6 +16,7 @@
 <div id="todo-container">
     <h2 style="text-align: center">Jarvis TODO</h2>
     <div id="left-div" class="col-xs-8">
+        <!-- doing panel -->
         <div class="panel panel-primary" id="doing-panel">
             <div class="panel-heading">
                 <div class="input-group">
@@ -67,47 +68,18 @@
                         </div>
                     </div>
                 </div>
-                <ul v-for="item of items">
-                    <li draggable="true" v-on:dragstart="drag(item)">{{item}}</li>
-                </ul>
             </div>
         </div>
+
+        <!-- pending panel -->
         <div class="panel panel-success" id="pending-panel">
             <div class="panel-heading">
-                <h3 class="panel-title">Pending Items</h3>
-            </div>
-            <div v-on:drop="drop()" ondragover="allowDrop(event)" class="panel-body">
-                <ul v-for="item of items">
-                    <li draggable="true" v-on:dragstart="drag(item)">{{item}}</li>
-                </ul>
-            </div>
-        </div>
-        <div class="panel panel-danger " id="todo-panel">
-            <div class="panel-heading">
-                <h3 class="panel-title">Todo items</h3>
-            </div>
-            <div v-on:drop="drop()" ondragover="allowDrop(event)" class="panel-body">
-                <ul v-for="item of items">
-                    <li draggable="true" v-on:dragstart="drag(item)">{{item}}</li>
-                </ul>
-            </div>
-        </div>
-        <div class="panel panel-info" id="done-panel">
-            <div class="panel-heading">
-                <h3 class="panel-title">Done Items</h3>
-            </div>
-            <div v-on:drop="drop()" ondragover="allowDrop(event)" class="panel-body">
-                <ul v-for="item of items">
-                    <li draggable="true" v-on:dragstart="drag(item)">{{item}}</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-
-    <div id="right-div" class="col-xs-4">
-        <div class="panel panel-default" id="template-panel">
-            <div class="panel-heading">
-                <h3 class="panel-title">Template Items</h3>
+                <div class="input-group">
+                    <h3 class="panel-title" style="padding-top: 3px">Pending Items</h3>
+                    <span class="input-group-btn">
+                        <button v-on:click="onCreate()" class="btn btn-default btn-xs" type="button">+</button>
+                    </span>
+                </div>
             </div>
             <div v-on:drop="drop()" ondragover="allowDrop(event)" class="panel-body">
                 <div v-for="item of items">
@@ -115,33 +87,266 @@
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a role="button" data-toggle="collapse" :href="'#'+item.uuid" aria-expanded="false">
-                                    <input class="col-xs-9" :value="item.title" disabled="true"/>
+                                    <input class="col-xs-10" :value="item.title" disabled="disabled"/>
                                 </a>
                                 <div class="input-group">
-                                    <button>Edit</button>
-                                    <button>Del</button>
+                                    <button v-on:click="onEdit(item)">Edit</button>
+                                    <button v-on:click="onDel(item)">Del</button>
                                 </div>
                             </h4>
                         </div>
                         <div :id="item.uuid" class="panel-collapse collapse out">
                             <div class="panel-body">
-                                {{item.uuid}}
+                                <div class="col-xs-6">
+                                    <label style="width: 20%">Due Time:</label>
+                                    <input :value="item.dueTime" disabled="disabled" style="width: 75%">
+                                </div>
+                                <div class="col-xs-6">
+                                    <label style="width: 20%">Cost Time:</label>
+                                    <input :value="item.costTime" disabled="disabled" style="width: 75%">
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label>Detail:</label>
+                                    <textarea rows="5" class="col-xs-12" disabled="disabled"
+                                              style="resize: none"></textarea>
+                                </div>
+                                <div class="col-xs-6">
+                                    <label>Created Time:</label>
+                                    <span>{{item.createdTime}}</span>
+                                </div>
+                                <div class="col-xs-6">
+                                    <label>Finished Time:</label>
+                                    <span>{{item.finishedTime}}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="panel panel-warning" id="future-panel">
+
+        <!-- todo panel -->
+        <div class="panel panel-danger" id="todo-panel">
             <div class="panel-heading">
-                <h3 class="panel-title">Future Items</h3>
+                <div class="input-group">
+                    <h3 class="panel-title" style="padding-top: 3px">Todo Items</h3>
+                    <span class="input-group-btn">
+                        <button v-on:click="onCreate()" class="btn btn-default btn-xs" type="button">+</button>
+                    </span>
+                </div>
             </div>
             <div v-on:drop="drop()" ondragover="allowDrop(event)" class="panel-body">
-                <ul v-for="item of items">
-                    <li draggable="true" v-on:dragstart="drag(item)">{{item}}</li>
-                </ul>
+                <div v-for="item of items">
+                    <div draggable="true" v-on:dragstart="drag(item)" class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a role="button" data-toggle="collapse" :href="'#'+item.uuid" aria-expanded="false">
+                                    <input class="col-xs-10" :value="item.title" disabled="disabled"/>
+                                </a>
+                                <div class="input-group">
+                                    <button v-on:click="onEdit(item)">Edit</button>
+                                    <button v-on:click="onDel(item)">Del</button>
+                                </div>
+                            </h4>
+                        </div>
+                        <div :id="item.uuid" class="panel-collapse collapse out">
+                            <div class="panel-body">
+                                <div class="col-xs-6">
+                                    <label style="width: 20%">Due Time:</label>
+                                    <input :value="item.dueTime" disabled="disabled" style="width: 75%">
+                                </div>
+                                <div class="col-xs-6">
+                                    <label style="width: 20%">Cost Time:</label>
+                                    <input :value="item.costTime" disabled="disabled" style="width: 75%">
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label>Detail:</label>
+                                    <textarea rows="5" class="col-xs-12" disabled="disabled"
+                                              style="resize: none"></textarea>
+                                </div>
+                                <div class="col-xs-6">
+                                    <label>Created Time:</label>
+                                    <span>{{item.createdTime}}</span>
+                                </div>
+                                <div class="col-xs-6">
+                                    <label>Finished Time:</label>
+                                    <span>{{item.finishedTime}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+
+        <!-- done panel -->
+        <div class="panel panel-info" id="done-panel">
+            <div class="panel-heading">
+                <div class="input-group">
+                    <h3 class="panel-title" style="padding-top: 3px">Done Items</h3>
+                    <span class="input-group-btn">
+                        <button v-on:click="onCreate()" class="btn btn-default btn-xs" type="button">+</button>
+                    </span>
+                </div>
+            </div>
+            <div v-on:drop="drop()" ondragover="allowDrop(event)" class="panel-body">
+                <div v-for="item of items">
+                    <div draggable="true" v-on:dragstart="drag(item)" class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a role="button" data-toggle="collapse" :href="'#'+item.uuid" aria-expanded="false">
+                                    <input class="col-xs-10" :value="item.title" disabled="disabled"/>
+                                </a>
+                                <div class="input-group">
+                                    <button v-on:click="onEdit(item)">Edit</button>
+                                    <button v-on:click="onDel(item)">Del</button>
+                                </div>
+                            </h4>
+                        </div>
+                        <div :id="item.uuid" class="panel-collapse collapse out">
+                            <div class="panel-body">
+                                <div class="col-xs-6">
+                                    <label style="width: 20%">Due Time:</label>
+                                    <input :value="item.dueTime" disabled="disabled" style="width: 75%">
+                                </div>
+                                <div class="col-xs-6">
+                                    <label style="width: 20%">Cost Time:</label>
+                                    <input :value="item.costTime" disabled="disabled" style="width: 75%">
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label>Detail:</label>
+                                    <textarea rows="5" class="col-xs-12" disabled="disabled"
+                                              style="resize: none"></textarea>
+                                </div>
+                                <div class="col-xs-6">
+                                    <label>Created Time:</label>
+                                    <span>{{item.createdTime}}</span>
+                                </div>
+                                <div class="col-xs-6">
+                                    <label>Finished Time:</label>
+                                    <span>{{item.finishedTime}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="right-div" class="col-xs-4">
+        <!-- template panel -->
+        <div class="panel panel-default" id="template-panel">
+            <div class="panel-heading">
+                <div class="input-group">
+                    <h3 class="panel-title" style="padding-top: 3px">Template Items</h3>
+                    <span class="input-group-btn">
+                        <button v-on:click="onCreate()" class="btn btn-default btn-xs" type="button">+</button>
+                    </span>
+                </div>
+            </div>
+            <div v-on:drop="drop()" ondragover="allowDrop(event)" class="panel-body">
+                <div v-for="item of items">
+                    <div draggable="true" v-on:dragstart="drag(item)" class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a role="button" data-toggle="collapse" :href="'#'+item.uuid" aria-expanded="false">
+                                    <input class="col-xs-9" :value="item.title" disabled="disabled"/>
+                                </a>
+                                <div class="input-group">
+                                    <button v-on:click="onEdit(item)">Edit</button>
+                                    <button v-on:click="onDel(item)">Del</button>
+                                </div>
+                            </h4>
+                        </div>
+                        <div :id="item.uuid" class="panel-collapse collapse out">
+                            <div class="panel-body">
+                                <div class="col-xs-6">
+                                    <label style="width: 20%">Due Time:</label>
+                                    <input :value="item.dueTime" disabled="disabled" style="width: 75%">
+                                </div>
+                                <div class="col-xs-6">
+                                    <label style="width: 20%">Cost Time:</label>
+                                    <input :value="item.costTime" disabled="disabled" style="width: 75%">
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <label>Detail:</label>
+                                    <textarea rows="5" class="col-xs-12" disabled="disabled"
+                                              style="resize: none"></textarea>
+                                </div>
+                                <div class="col-xs-6">
+                                    <label>Created Time:</label>
+                                    <span>{{item.createdTime}}</span>
+                                </div>
+                                <div class="col-xs-6">
+                                    <label>Finished Time:</label>
+                                    <span>{{item.finishedTime}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- future panel -->
+            <div class="panel panel-warning" id="future-panel">
+                <div class="panel-heading">
+                    <div class="input-group">
+                        <h3 class="panel-title" style="padding-top: 3px">Future Items</h3>
+                        <span class="input-group-btn">
+                        <button v-on:click="onCreate()" class="btn btn-default btn-xs" type="button">+</button>
+                    </span>
+                    </div>
+                </div>
+                <div v-on:drop="drop()" ondragover="allowDrop(event)" class="panel-body">
+                    <div v-for="item of items">
+                        <div draggable="true" v-on:dragstart="drag(item)" class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a role="button" data-toggle="collapse" :href="'#'+item.uuid" aria-expanded="false">
+                                        <input class="col-xs-9" :value="item.title" disabled="disabled"/>
+                                    </a>
+                                    <div class="input-group">
+                                        <button v-on:click="onEdit(item)">Edit</button>
+                                        <button v-on:click="onDel(item)">Del</button>
+                                    </div>
+                                </h4>
+                            </div>
+                            <div :id="item.uuid" class="panel-collapse collapse out">
+                                <div class="panel-body">
+                                    <div class="col-xs-6">
+                                        <label style="width: 20%">Due Time:</label>
+                                        <input :value="item.dueTime" disabled="disabled" style="width: 75%">
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <label style="width: 20%">Cost Time:</label>
+                                        <input :value="item.costTime" disabled="disabled" style="width: 75%">
+                                    </div>
+
+                                    <div class="col-xs-12">
+                                        <label>Detail:</label>
+                                        <textarea rows="5" class="col-xs-12" disabled="disabled"
+                                                  style="resize: none"></textarea>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <label>Created Time:</label>
+                                        <span>{{item.createdTime}}</span>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <label>Finished Time:</label>
+                                        <span>{{item.finishedTime}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
     </div>
 </div>
 </body>
@@ -165,6 +370,10 @@
             queryDom.text('Edit');
             itemInput.attr('disabled', true);
             itemText.attr('disabled', true);
+            axios.post('/todo/updateitem', item)
+                .catch(function (error) {
+                    console.log(error);
+                });
         }
     }
 
@@ -242,7 +451,7 @@
         el: "#doing-panel",
         data: {
             type: 'doing',
-            items: [{'uuid': '001', 'title': 't1'}, {'uuid': '002', 'title': 't2'}],
+            items: [],
             timer: {}
         },
         created() {
@@ -307,7 +516,18 @@
 
                 // add new item
                 addDroppedItem(this);
-
+            },
+            onCreate: function () {
+                createNewItem(this);
+            },
+            onEdit: function (item) {
+                toggleEdit(item, event.currentTarget);
+            },
+            onDel: function (item) {
+                dragItem = item;
+                dragVue = this;
+                dragType = this.type;
+                removeDraggedItem();
             }
         }
     });
@@ -334,7 +554,18 @@
 
                 // add new item
                 addDroppedItem(this);
-
+            },
+            onCreate: function () {
+                createNewItem(this);
+            },
+            onEdit: function (item) {
+                toggleEdit(item, event.currentTarget);
+            },
+            onDel: function (item) {
+                dragItem = item;
+                dragVue = this;
+                dragType = this.type;
+                removeDraggedItem();
             }
         }
     });
@@ -361,7 +592,18 @@
 
                 // add new item
                 addDroppedItem(this);
-
+            },
+            onCreate: function () {
+                createNewItem(this);
+            },
+            onEdit: function (item) {
+                toggleEdit(item, event.currentTarget);
+            },
+            onDel: function (item) {
+                dragItem = item;
+                dragVue = this;
+                dragType = this.type;
+                removeDraggedItem();
             }
         }
     });
@@ -388,7 +630,18 @@
 
                 // add new item
                 addDroppedItem(this);
-
+            },
+            onCreate: function () {
+                createNewItem(this);
+            },
+            onEdit: function (item) {
+                toggleEdit(item, event.currentTarget);
+            },
+            onDel: function (item) {
+                dragItem = item;
+                dragVue = this;
+                dragType = this.type;
+                removeDraggedItem();
             }
         }
     });
@@ -415,7 +668,18 @@
 
                 // add new item
                 addDroppedItem(this);
-
+            },
+            onCreate: function () {
+                createNewItem(this);
+            },
+            onEdit: function (item) {
+                toggleEdit(item, event.currentTarget);
+            },
+            onDel: function (item) {
+                dragItem = item;
+                dragVue = this;
+                dragType = this.type;
+                removeDraggedItem();
             }
         }
     });
