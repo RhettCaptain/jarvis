@@ -32,7 +32,7 @@
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a role="button" data-toggle="collapse" :href="'#'+item.uuid" aria-expanded="false">
-                                    <input class="col-xs-10" :value="item.title" disabled="disabled"/>
+                                    <input class="col-xs-10 title-input" :value="item.title" disabled="disabled"/>
                                 </a>
                                 <div class="input-group">
                                     <button v-on:click="onEdit(item)">Edit</button>
@@ -87,7 +87,7 @@
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a role="button" data-toggle="collapse" :href="'#'+item.uuid" aria-expanded="false">
-                                    <input class="col-xs-10" :value="item.title" disabled="disabled"/>
+                                    <input class="col-xs-10 title-input" :value="item.title" disabled="disabled"/>
                                 </a>
                                 <div class="input-group">
                                     <button v-on:click="onEdit(item)">Edit</button>
@@ -142,7 +142,7 @@
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a role="button" data-toggle="collapse" :href="'#'+item.uuid" aria-expanded="false">
-                                    <input class="col-xs-10" :value="item.title" disabled="disabled"/>
+                                    <input class="col-xs-10 title-input" :value="item.title" disabled="disabled"/>
                                 </a>
                                 <div class="input-group">
                                     <button v-on:click="onEdit(item)">Edit</button>
@@ -197,7 +197,7 @@
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a role="button" data-toggle="collapse" :href="'#'+item.uuid" aria-expanded="false">
-                                    <input class="col-xs-10" :value="item.title" disabled="disabled"/>
+                                    <input class="col-xs-10 title-input" :value="item.title" disabled="disabled"/>
                                 </a>
                                 <div class="input-group">
                                     <button v-on:click="onEdit(item)">Edit</button>
@@ -254,7 +254,7 @@
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a role="button" data-toggle="collapse" :href="'#'+item.uuid" aria-expanded="false">
-                                    <input class="col-xs-9" :value="item.title" disabled="disabled"/>
+                                    <input class="col-xs-9 title-input" :value="item.title" disabled="disabled"/>
                                 </a>
                                 <div class="input-group">
                                     <button v-on:click="onEdit(item)">Edit</button>
@@ -309,7 +309,7 @@
                             <div class="panel-heading">
                                 <h4 class="panel-title">
                                     <a role="button" data-toggle="collapse" :href="'#'+item.uuid" aria-expanded="false">
-                                        <input class="col-xs-9" :value="item.title" disabled="disabled"/>
+                                        <input class="col-xs-9 title-input" :value="item.title" disabled="disabled"/>
                                     </a>
                                     <div class="input-group">
                                         <button v-on:click="onEdit(item)">Edit</button>
@@ -369,7 +369,10 @@
             queryDom.text('Edit');
             itemInput.attr('disabled', true);
             itemText.attr('disabled', true);
-            item.title = itemInput.find("#")
+            item.title = topItemDiv.find(".title-input").val();
+            item.dueTime = topItemDiv.find(".due-time-input").val();
+            item.costTime = topItemDiv.find(".cost-time-input").val();
+            item.detail = itemText.val();
             axios.post('/todo/updateitem', item)
                 .catch(function (error) {
                     console.log(error);
@@ -419,6 +422,7 @@
         // calculate time cost
         if (dragType == 'DOING') {
             var timeCost = new Date().getTime() - (dragVue.timer[item.uuid] == null ? dragVue.timer['created'] : dragVue.timer[item.uuid]);
+            //todo fix here, and maybe use Time better?
             item.costTime += timeCost;
         }
 
