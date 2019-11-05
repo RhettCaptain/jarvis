@@ -1,6 +1,5 @@
 package com.github.rhettcaptain.jarvis.todo.vo;
 
-import com.github.rhettcaptain.jarvis.todo.consts.TodoConst;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

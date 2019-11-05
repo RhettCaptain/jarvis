@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 import com.github.rhettcaptain.jarvis.bookmark.dto.BookmarkDto;
 import com.github.rhettcaptain.jarvis.util.ExceptionUtil;
-import com.github.rhettcaptain.jarvis.util.JarvisObjectMapper;
+import com.github.rhettcaptain.jarvis.util.jackson.JarvisObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 

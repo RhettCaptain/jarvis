@@ -361,6 +361,7 @@
         var topItemDiv = queryDom.parent().parent().parent().parent();
         var itemInput = topItemDiv.find("input");
         var itemText = topItemDiv.find("textarea");
+        var collapseDiv = topItemDiv.find(".panel-collapse");
         if (queryDom.text() == 'Edit') {
             queryDom.text('Save');
             itemInput.attr('disabled', false);
@@ -373,6 +374,7 @@
             item.dueTime = topItemDiv.find(".due-time-input").val();
             item.costTime = topItemDiv.find(".cost-time-input").val();
             item.detail = itemText.val();
+            collapseDiv.collapse('hide');
             axios.post('/todo/updateitem', item)
                 .catch(function (error) {
                     console.log(error);
@@ -401,6 +403,10 @@
     }
 
     function removeDraggedItem() {
+        if (dragType == "TEMPLATE") {
+            return;
+        }
+
         var item = deepCopy(dragItem);
         // remove in front-end
         for (var idx in dragVue.items) {
@@ -419,11 +425,37 @@
 
     function addDroppedItem(vue) {
         var item = deepCopy(dragItem);
+
+        if (dragType == 'TEMPLATE') {
+            axios.post('/todo/createnewitem', {type: vue.type})
+                .then(response => {
+                    var newItem = response.data;
+                    newItem.title = item.title;
+                    newItem.detail = item.detail;
+                    newItem.dueTime = item.dueTime;
+                    vue.items.push(newItem);
+                    axios.post('/todo/updateitem', newItem)
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            return;
+        }
+
         // calculate time cost
         if (dragType == 'DOING') {
             var timeCost = new Date().getTime() - (dragVue.timer[item.uuid] == null ? dragVue.timer['created'] : dragVue.timer[item.uuid]);
-            //todo fix here, and maybe use Time better?
-            item.costTime += timeCost;
+            var now = new Date();
+            if(item.costTime != null && item.costTime != ""){
+                var hms = item.costTime.split(":");
+                now.setHours(hms[0],hms[1],hms[2]);
+            }else{
+                now.setHours(0,0,0);
+            }
+            item.costTime = new Date(now.getTime() + timeCost).format("HH:mm:ss");
         }
 
         // add in front-end
@@ -447,10 +479,30 @@
             });
     }
 
+    Date.prototype.format = function(fmt)
+    { //author: meizz
+        var o = {
+            "M+" : this.getMonth()+1,
+            "d+" : this.getDate(),
+            "H+" : this.getHours(),
+            "m+" : this.getMinutes(),
+            "s+" : this.getSeconds(),
+            "q+" : Math.floor((this.getMonth()+3)/3),
+            "S"  : this.getMilliseconds()
+        };
+        if(/(y+)/.test(fmt))
+            fmt=fmt.replace(RegExp.$1, (this.getFullYear()+"").substr(4 - RegExp.$1.length));
+        for(var k in o)
+            if(new RegExp("("+ k +")").test(fmt))
+                fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
+        return fmt;
+    }
+
     var dragItem;
     var dragType;
     var dragVue;
 
+    // vue script
     var vueDoingPanel = new Vue({
         el: "#doing-panel",
         data: {
@@ -645,7 +697,19 @@
                 dragItem = item;
                 dragVue = this;
                 dragType = this.type;
-                removeDraggedItem();
+                // remove in front-end
+                for (var idx in dragVue.items) {
+                    if (dragVue.items[idx].uuid == item.uuid) {
+                        dragVue.items.splice(idx, 1);
+                        break;
+                    }
+                }
+                // remove in back-end
+                console.info(item.type);
+                axios.post('/todo/deleteitem', item)
+                    .catch(function (error) {
+                        console.log(error);
+                    });
             }
         }
     });
@@ -687,7 +751,5 @@
             }
         }
     });
-
-
 </script>
 </html>
