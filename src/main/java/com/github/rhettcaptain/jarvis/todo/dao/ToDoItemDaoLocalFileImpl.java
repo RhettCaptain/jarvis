@@ -158,7 +158,7 @@ public class ToDoItemDaoLocalFileImpl implements ToDoItemDao {
             }
         }
         try{
-            FileCopyUtils.copy(doneFile, archDir);
+            FileCopyUtils.copy(doneFile, archFile);
             doneFile.delete();
         }catch (IOException e){
             log.warn(ExceptionUtil.getStackTrace(e));

@@ -66,6 +66,7 @@ public class ToDoServiceImpl implements ToDoService {
             List<ToDoItemVo> oneDayVos = itemDao.getArchiveByDate(LocalDateTime.ofInstant(formerCalendar.toInstant(),
                     ZoneId.systemDefault()).toLocalDate()).stream().map(this::convertItemDtoToVo).collect(Collectors.toList());
             allArchived.addAll(oneDayVos);
+            formerCalendar.add(Calendar.DAY_OF_YEAR,1);
         }
         return allArchived;
     }
