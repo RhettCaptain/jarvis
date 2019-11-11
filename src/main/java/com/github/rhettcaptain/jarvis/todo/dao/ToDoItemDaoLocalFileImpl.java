@@ -15,6 +15,7 @@ import java.io.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 public class ToDoItemDaoLocalFileImpl implements ToDoItemDao {
     private final static String JARVIS_DB_PATH = "jarvis_db";
     private final static String DONE_ARCHIVE_PATH = "jarvis_db/done_archive";
+    private final static String BACKUP_PATH = "jarvis_db/todo_backup";
     @Autowired
     private JarvisObjectMapper mapper;
 
@@ -163,6 +165,8 @@ public class ToDoItemDaoLocalFileImpl implements ToDoItemDao {
         }catch (IOException e){
             log.warn(ExceptionUtil.getStackTrace(e));
         }
+
+        backup();
     }
 
     private String getTablePathByItem(String type){
@@ -171,5 +175,23 @@ public class ToDoItemDaoLocalFileImpl implements ToDoItemDao {
 
     private String getTablePathByItem(ItemType type){
         return getTablePathByItem(type.name());
+    }
+
+    private void backup(){
+        File archDir = new File(BACKUP_PATH);
+        if (!archDir.exists()) {
+            archDir.mkdir();
+        }
+        Arrays.asList("future","template","doing","pending","todo").stream().forEach(type -> {
+            File doneFile = new File(JARVIS_DB_PATH +  "/" + type);
+            File archFile = new File(BACKUP_PATH + "/" + type);
+            if (doneFile.exists()) {
+                try{
+                    FileCopyUtils.copy(doneFile, archFile);
+                }catch (IOException e){
+                    log.warn(ExceptionUtil.getStackTrace(e));
+                }
+            }
+        });
     }
 }
